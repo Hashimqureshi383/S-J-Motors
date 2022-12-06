@@ -118,8 +118,8 @@ public class Driver
             }  
             else if(type==1) 
             {
-                //Output Attendance table here for floor manager
-
+                //Output Attendance table here for floor manager3
+                //Hashim print the records.attendance list her
             }
             
             }
