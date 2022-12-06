@@ -6,7 +6,7 @@ Java console application that manages the working of S&J motors.
 ## Use Cases and Description
 
 ### Description:  ####
-A Java application made using springboot and MySQL database.
+A Java gradle application made using springboot and MySQL database.
 
 ### Use Cases:
 
