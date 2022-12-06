@@ -75,4 +75,75 @@ public class Driver
         else if(choice==3)
             return;
     }
+    private static void userPage(User loggedInUser)
+    {
+        while(true)
+        {
+            byte choice=0;
+            System.out.flush();
+            System.out.print("\n\t\t\tS&JMotors:User\n\n");
+            System.out.print("You can do following actions on this page\n");
+            System.out.print("1. See mileage of your Vehicle \n");
+            System.out.print("2. See your job history(Repair work) \n");
+            System.out.print("3. See cost spent on all jobs \n");
+            System.out.print("4. Log Out \n");
+            Scanner input=new Scanner(System.in);
+            choice=input.nextByte();
+            if(choice==1)
+            {
+                System.out.flush();
+                System.out.println("Your Vehicles and their Mileages:\n\n");
+                int count=0;
+                Iterator<Vehicle> it=app.vehicles.iterator();
+                while (it.hasNext())
+                {
+                    if (it.next().getRegBy()==loggedInUser.getCnic())
+                    {
+                        System.out.println(it.next().getCompany()+"Model No: "+it.next().getModel()+" Mileage: 100 units\n");
+                        count++;
+                    }
+                }
+                if(count==0)
+                    System.out.println("You do not own any Vehicle");
+            }
+            else if (choice==2)
+            {
+                int count=0;
+                Iterator<Job> it = app.jobs.iterator();
+                while (it.hasNext())
+                {
+                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
+                    {
+                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+"\n");
+                        count++;
+                    }
+                }
+                if (count==0)
+                    System.out.println("You have not taken any Service yet.\n");
+            }
+            else if (choice == 3)
+            {
+                int count=0;
+                float cost=0;
+                Iterator<Job> it=app.jobs.iterator();
+                while (it.hasNext())
+                {
+                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
+                    {
+                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+" Costed: 1000 PKR\n");
+                        count++;
+                    }
+                }
+                if(count==0)
+                    System.out.println("You have not taken any Service yet.\n");
+                else
+                {
+                    cost=1000*count;
+                    System.out.println("The Total Cost is : "+Float.toString(cost)+" PKR\n");
+                }
+            }
+            else if(choice==4)
+                return;
+        }
+    }                      
 }
