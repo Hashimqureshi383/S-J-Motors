@@ -33,14 +33,71 @@ public class Driver
             choice=input.nextByte();
             if(choice==1)
             {
-                //manager login
+                managerPage();
             }
             else if(choice==2)
                 firstPage();
             else if(choice==3)
-                System.out.println("");
+                staffPage();
             else if(choice==4)
                 return;
+        }
+    }
+    private static void staffPage()
+    {
+        boolean marked=false;
+        while(true)
+        {
+            System.out.flush();
+            System.out.println("S&JMotors:Staff\n\n");
+            System.out.println("1. Mark Attendance\n");
+            System.out.println("2. Go Back");
+            Scanner input_staff=new Scanner(System.in);
+            int option=0;
+            option =input_staff.nextInt();
+            if(option==1)
+            {
+                if(marked)
+                {
+                    System.out.println("Your Attendance is Already Marked. Press Any key to continue...");
+                    input_staff.nextInt();
+                }
+                else
+                {
+                    int id=input_staff.nextInt();
+                    Iterator<Staff> it=app.employees.iterator();
+                    while(it.hasNext())
+                    {
+                        if(it.next().getId()==id)
+                        {
+                            System.out.println("Attendance Marked Successfully");
+                            marked=true;
+                            continue;
+                        }
+                    }
+                    long millis = System.currentTimeMillis();
+                    java.sql.Date date = new java.sql.Date(millis);
+                    Attendance obj=new Attendance(date.toString(), true, id);
+                    app.records.add(obj);
+                    FileWriter insertq;
+                    try {
+                        insertq=new FileWriter("DDL Queries.txt");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        insertq.write("Insert into attendancerecord (date,attendance,memberid) values (\'"+obj.getDate()+"\',1,"+Integer.toString(id));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            else if(option==2)
+            {
+                System.out.println("GoodBye\n");
+                input_staff.close();
+                return;
+            }
         }
     }
     private static void bookRequest(User requestee)
@@ -86,8 +143,6 @@ public class Driver
                 {
                     if(it.next().getCnic()==loginUser.getCnic())
                     {
-                        System.out.println("The User with this CNIC already exists.\n");
-                        loginUser.setPhone(input.nextLine());
                         System.out.println("Enter Password= ");
                         loginUser.setPassword(input.nextLine());
                         if(loginUser.getPassword()==it.next().getPassword())
@@ -151,6 +206,45 @@ public class Driver
         }
 
     }
+    private static void managerPage()
+    {
+        while(true)
+        {
+            System.out.flush();
+            byte choice=0;
+            String temp;
+            System.out.println("1. Login\n");
+            System.out.println("2. Go Back\n");
+            Scanner input=new Scanner(System.in);
+            choice=input.nextByte();
+            if(choice==1)
+            {
+                Manager loginManager=new Manager();
+                System.out.println("Enter id= ");
+                loginManager.setId(input.nextInt());
+                Iterator<Manager> it=app.managers.iterator();
+                while(it.hasNext())
+                {
+                    if(it.next().getId()==loginManager.getId())
+                    {
+                        System.out.println("Enter Password= ");
+                        loginManager.setPassword(input.nextLine());
+                        if(loginManager.getPassword()==it.next().getPassword())
+                            adminMenu(loginManager);
+                        else
+                        {
+                            System.out.println("Wrong Password");
+                            continue;
+                        }
+                    }
+                }
+                System.out.println("Incorrect ID\n");
+            }
+            else if(choice==2)
+                return;
+        }
+
+    }
     private static void userPage(User loggedInUser)
     {
         while(true)
@@ -163,7 +257,8 @@ public class Driver
             System.out.print("1. See mileage of your Vehicle \n");
             System.out.print("2. See your job history(Repair work) \n");
             System.out.print("3. See cost spent on all jobs \n");
-            System.out.print("4. Log Out \n");
+            System.out.print("4. Request to Book a service \n");
+            System.out.print("5. Log Out \n");
             Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
@@ -220,7 +315,172 @@ public class Driver
                 }
             }
             else if(choice==4)
+                bookRequest(loggedInUser);
+            else if(choice==5)
                 return;
         }
     }
+    private static void adminMenu(Manager loggedInManager)
+    {
+        int op =0;
+
+        while (op != 6)
+        {
+            System.out.flush();
+            System.out.print("S&JMotors: Outlet Admin\n\n");
+            System.out.print("1. Add employee\n");
+            System.out.print("2. Remove employee\n");
+            System.out.print("3. Assign Task\n");
+            System.out.print("4. Show Jobs\n");
+            System.out.print("5. Show Employees\n");
+            System.out.print("6. Go Back\n");
+            Scanner input = new Scanner(System.in);
+            op = input.nextInt();
+            if (op == 1)
+            {
+                addEmployee();
+            }
+            else if (op == 2)
+            {
+                removeEmployee();
+            }
+            else if (op == 3)
+            {
+                AssignTask();
+            }
+            else if (op == 4)
+            {
+                AllJobs();
+            }
+            else if (op == 5) {
+                AllEmployee();
+            }
+
+        }
+    }
+
+    private static void AllEmployee()
+    {
+        System.out.println("\n\n\nAll Employees: \n\n\n");
+        Iterator<Staff> it = app.employees.iterator();
+        while (it.hasNext()) {
+            System.out.println("\nName: " + it.next().getName());
+            System.out.println(" Id: " + it.next().getId());
+        }
+    }
+
+    private static void AllJobs() {
+        System.out.println("\n\n\nAll Jobs: \n\n\n");
+
+        Iterator<Job> it = app.jobs.iterator();
+
+        while (it.hasNext()) {
+            System.out.println("\nID: " + it.next().getId());
+            System.out.println(" Description: " + it.next().getDescription());
+            System.out.println(" Date: " + it.next().getScheduleDate());
+            System.out.println(" StaffID: " + it.next().getStaffId());
+            System.out.println(" CustomerID: "+ it.next().getCustomerId());
+        }
+
+    }
+
+    private static void addEmployee() {
+        int id = 0;
+        String name = null;
+        String phone = null;
+        String Address = null;
+        int outletId = 0;
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n\n\nEnter CNIC= ");
+        id = sc.nextInt();
+        System.out.println("Enter Name= ");
+        name = sc.nextLine(); // reads string.
+        System.out.println("Enter Phone Number= ");
+        phone = sc.nextLine(); // reads string.
+        System.out.println("Enter Address= ");
+        Address = sc.nextLine(); // reads string.
+        System.out.println("Enter Outlet ID= ");
+        outletId = sc.nextInt();
+
+        Staff newEmployee = new Staff(id, name, phone, Address, outletId);
+        app.employees.add(newEmployee);
+        FileWriter insertq;
+        try {
+            insertq=new FileWriter("DDL Queries.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            insertq.write("Insert into staff (id,name,phone,address,outletid) values ("+Integer.toString(id)+",\'"+name+"\',\'"+phone+"\',\'"+Address+"\',"+Integer.toString(outletId));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // System.out.println("Employee Added");
+
+    }
+
+    private static void removeEmployee() {
+        int idR = 0;
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n\n\nEnter CNIC/ID to remove= ");
+        idR = sc.nextInt();
+
+        Iterator<Staff> it = app.employees.iterator();
+
+        int header = 0;
+
+        while (it.hasNext() && header == 0) {
+
+            if (it.next().id == idR) {
+                it.next().id = 0;
+                it.next().name = null;
+                it.next().outletId = 0;
+                it.next().Address = null;
+                it.next().phone = null;
+                header = 1;
+            }
+        }
+        if (header == 1) {
+            System.out.println("\n\n\nEmployee deactivated \n\n\n ");
+        }
+
+        else {
+            System.out.println("\n\n\nEmployee Out Found \n\n\n ");
+
+        }
+    }
+    private static void AssignTask()
+    {
+        System.out.println("\n\n\nAssigning task\n\n\n");
+        int id = 0;
+        String description = null;
+        int customerId = 0;
+        int staffId = 0;
+        String scheduleDate = null;
+        int outletId = 0;
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n\n\nEnter Job ID= ");
+        id = sc.nextInt();
+        System.out.println("Enter Desprictions= ");
+        description = sc.nextLine(); // reads string.
+        System.out.println("Enter customer ID= ");
+        customerId = sc.nextInt(); // reads string.
+        System.out.println("Enter scheduleDate= ");
+        scheduleDate = sc.nextLine(); // reads string.
+        System.out.println("Enter Outlet ID= ");
+        outletId = sc.nextInt();
+
+        Job newJob = new Job(id, description, customerId, staffId, scheduleDate, outletId,false);
+
+        app.jobs.add(newJob);
+
+    }
+
+}
 }

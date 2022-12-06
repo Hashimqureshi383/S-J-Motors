@@ -9,6 +9,10 @@ import java.util.Scanner;
     String address;
     int outletId;
 
+    public Manager()
+    {
+
+    }
     public Manager(int id,String name,String phone,String password,String address,int outletId)
     {
         setId(id);
