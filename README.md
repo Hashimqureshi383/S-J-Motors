@@ -45,6 +45,8 @@ A Java gradle application made using springboot and MySQL database.
 * Add Employee
 * Remove Employee
 * Assign Tasks
+* View All Employees
+* View All Jobs
 
 #### View Statistics (Done By AhmadUllah)
 * View Job History
