@@ -30,10 +30,10 @@ A Java application made using springboot and MySQL database.
  
 *  The staff should be able to mark their attendance.
 
-### Display Attendance to Floor Manager (Done by Syed Ali Abbas)
+#### Display Attendance to Floor Manager (Done by Syed Ali Abbas)
  
 *  The floor admin should be able to view all the marked attendance of the staff
 
-### Manage Users (Done By Hassaan Tahir)
+#### Manage Users (Done By Hassaan Tahir)
 * The user should be able to book a service request.
 
