@@ -13,7 +13,7 @@ public class Driver
     //my commit
     public static void main(String[] args)
     {
-        byte choice=0;
+        byte choice;
         while(true)
         {
             System.out.flush();
@@ -32,11 +32,13 @@ public class Driver
             Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
-                firstPage();
+            {
+                //manager login
+            }
             else if(choice==2)
                 firstPage();
             else if(choice==3)
-                firstPage();
+                System.out.println("");
             else if(choice==4)
                 return;
         }
@@ -75,12 +77,44 @@ public class Driver
             Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
-                System.out.println("");
+            {
+                User loginUser=new User();
+                System.out.println("Enter CNIC= ");
+                loginUser.setCnic(input.nextInt());
+                Iterator<User> it=app.users.iterator();
+                while(it.hasNext())
+                {
+                    if(it.next().getCnic()==loginUser.getCnic())
+                    {
+                        System.out.println("The User with this CNIC already exists.\n");
+                        loginUser.setPhone(input.nextLine());
+                        System.out.println("Enter Password= ");
+                        loginUser.setPassword(input.nextLine());
+                        if(loginUser.getPassword()==it.next().getPassword())
+                            userPage(loginUser);
+                        else
+                        {
+                            System.out.println("Wrong Password");
+                            continue;
+                        }
+                    }
+                }
+                System.out.println("Incorrect CNIC\n");
+            }
             else if(choice==2)
             {
                 User newUser=new User();
                 System.out.println("Enter CNIC= ");
                 newUser.setCnic(input.nextInt());
+                Iterator<User> it=app.users.iterator();
+                while(it.hasNext())
+                {
+                    if(it.next().getCnic()==newUser.getCnic())
+                    {
+                        System.out.println("The User with this CNIC already exists.\n");
+                        continue;
+                    }
+                }
                 System.out.println("Enter Name= ");
                 newUser.setName(input.nextLine());
                 System.out.println("Enter Phone Number= ");
@@ -107,15 +141,86 @@ public class Driver
                     throw new RuntimeException(e);
                 }
                 try {
-                    insertq.write(newUser.getCnic()+",\'"+newUser.getName()+"\',\'"+newUser.getPhone()+"\',\'"+newUser.getPassword()+"\',\'"+newUser.getAddress()+"\',0,1");
+                    insertq.write(Integer.toString(newUser.getCnic())+",\'"+newUser.getName()+"\',\'"+newUser.getPhone()+"\',\'"+newUser.getPassword()+"\',\'"+newUser.getAddress()+"\',0,1");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
             else if(choice==3)
                 return;
         }
 
+    }
+    private static void userPage(User loggedInUser)
+    {
+        while(true)
+        {
+            System.out.flush();
+            byte choice=0;
+            System.out.flush();
+            System.out.print("\n\t\t\tS&JMotors:User\n\n");
+            System.out.print("You can do following actions on this page\n");
+            System.out.print("1. See mileage of your Vehicle \n");
+            System.out.print("2. See your job history(Repair work) \n");
+            System.out.print("3. See cost spent on all jobs \n");
+            System.out.print("4. Log Out \n");
+            Scanner input=new Scanner(System.in);
+            choice=input.nextByte();
+            if(choice==1)
+            {
+                System.out.flush();
+                System.out.println("Your Vehicles and their Mileages:\n\n");
+                int count=0;
+                Iterator<Vehicle> it=app.vehicles.iterator();
+                while (it.hasNext())
+                {
+                    if (it.next().getRegBy()==loggedInUser.getCnic())
+                    {
+                        System.out.println(it.next().getCompany()+"Model No: "+it.next().getModel()+" Mileage: 100 units\n");
+                        count++;
+                    }
+                }
+                if(count==0)
+                    System.out.println("You do not own any Vehicle");
+            }
+            else if (choice==2)
+            {
+                int count=0;
+                Iterator<Job> it = app.jobs.iterator();
+                while (it.hasNext())
+                {
+                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
+                    {
+                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+"\n");
+                        count++;
+                    }
+                }
+                if (count==0)
+                    System.out.println("You have not taken any Service yet.\n");
+            }
+            else if (choice == 3)
+            {
+                int count=0;
+                float cost=0;
+                Iterator<Job> it=app.jobs.iterator();
+                while (it.hasNext())
+                {
+                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
+                    {
+                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+" Costed: 1000 PKR\n");
+                        count++;
+                    }
+                }
+                if(count==0)
+                    System.out.println("You have not taken any Service yet.\n");
+                else
+                {
+                    cost=1000*count;
+                    System.out.println("The Total Cost is : "+Float.toString(cost)+" PKR\n");
+                }
+            }
+            else if(choice==4)
+                return;
+        }
     }
 }

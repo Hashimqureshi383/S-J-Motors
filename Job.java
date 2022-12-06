@@ -6,8 +6,9 @@
     int staffId;
     String scheduleDate;
     int outletId;
+    boolean status;
 
-    public Job(int id,String description,int customerId,int staffId,String scheduleDate,int outletId)
+    public Job(int id,String description,int customerId,int staffId,String scheduleDate,int outletId,boolean status)
     {
         setId(id);
         setDescription(description);
@@ -15,6 +16,7 @@
         setStaffId(staffId);
         setScheduleDate(scheduleDate);
         setOutletId(outletId);
+        setStatus(status);
     }
     //setters
     public void setId(int id)
@@ -41,6 +43,10 @@
     {
         this.outletId=outletId;
     }
+    public void setStatus(boolean status)
+    {
+        this.status=status;
+    }
 
     //getters
     public int getId()
@@ -66,5 +72,9 @@
     public int getOutletId()
     {
         return outletId;
+    }
+    public boolean getStatus()
+    {
+        return status;
     }
 }

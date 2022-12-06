@@ -169,7 +169,7 @@ import java.util.Vector;
                 jobs=new Vector<Job>(noofJobs);
                 while(data.next())
                 {
-                    Job temp=new Job(data.getInt(1),data.getString(2),data.getInt(3),data.getInt(4),data.getString(5),data.getInt(6));
+                    Job temp=new Job(data.getInt(1),data.getString(2),data.getInt(3),data.getInt(4),data.getString(5),data.getInt(6),data.getBoolean(7));
                     jobs.add(temp);
                 }
             }
