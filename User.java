@@ -1,4 +1,6 @@
-     public class User implements DataDisplay.ViewStatistics
+import java.util.Scanner;
+
+public class User implements DataDisplay.ViewStatistics
 {
     int cnic;
     String name;
@@ -6,12 +8,13 @@
     String password;
     String Address;
     int outletId;
+    boolean status;
 
     public User()
     {
 
     }
-    public User(int cnic,String name,String phone,String password,String Address,int outletId)
+    public User(int cnic,String name,String phone,String password,String Address,int outletId,boolean status)
     {
         setCnic(cnic);
         setName(name);
@@ -45,7 +48,10 @@
     {
         this.outletId=outletId;
     }
-
+    public void setStatus(boolean status)
+    {
+        this.status=status;
+    }
     //getters
     public int getCnic()
     {
@@ -71,6 +77,10 @@
     {
         return outletId;
     }
+    public boolean getStatus()
+    {
+        return status;
+    }
     public boolean registerToService(int cnic, String name, String phone, String password, String address)
     {
         setCnic(cnic);
@@ -90,10 +100,6 @@
             return true;
     }
     public void enterData()
-    {
-
-    }
-    public void bookService()
     {
 
     }
