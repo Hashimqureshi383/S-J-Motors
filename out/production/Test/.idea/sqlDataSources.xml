@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DdlMappings">
     <mapping uuid="d77c7e61-bc12-49c0-8d2f-df4d6a71568a" name="@localhost Mapping">
-      <data-sources db="5a7fce49-d202-465f-866a-20387842e452" ddl="86ceda76-3b02-4e3d-a1ca-610fbc482477" />
+      <data-sources db="5a7fce49-d202-465f-866a-20387842e452" ddl="18b62e42-5220-4276-bba2-3507e4cfbf67" />
       <scope>
         <node kind="schema" qname="sjmotors" />
       </scope>
