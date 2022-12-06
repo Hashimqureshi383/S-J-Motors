@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 
+import javax.swing.SingleSelectionModel;
+
 public class Driver
 {
     static Server app;
@@ -32,11 +34,11 @@ public class Driver
             Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
-                firstPage();
+                firstPage(choice);
             else if(choice==2)
-                firstPage();
+                firstPage(choice);
             else if(choice==3)
-                firstPage();
+                firstPage(choice);
             else if(choice==4)
                 return;
         }
@@ -61,7 +63,7 @@ public class Driver
         }
 
     }
-    private static void firstPage()
+    private static void firstPage(int type)
     {
         while(true)
         {
@@ -75,7 +77,52 @@ public class Driver
             Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
-                System.out.println("");
+                {System.out.println("");
+            //check login here
+            
+                //Change functionalitie accoriding to usertype
+            if(type==3)//Is staff and
+            {
+                System.out.println("Press 1 to mark Attendance");
+                System.out.println("Press 2 to exit");
+                Scanner input_staff=new Scanner(System.in);
+                int option=0;
+                do
+               { 
+                option =input_staff.nextInt();
+
+                if(option==1)
+                {
+                    System.out.println("Attendance Marked Successfully");
+
+                    Attendance obj=new Attendance( true, id);
+                     app.records.add(obj);
+                }
+                else if(option==2)
+                {
+
+                    System.out.println("GoodBye");
+                }
+                else
+                {
+                    System.out.println("Error Invalid Input, Enter Option again");
+
+                }
+                }
+                while(option!=2);
+                input_staff.close();
+
+                return;
+               
+            
+            }  
+            else if(type==1) 
+            {
+                //Output Attendance table here for floor manager
+
+            }
+            
+            }
             else if(choice==2)
             {
                 User newUser=new User();
