@@ -1,7 +1,6 @@
 # S&J-Motors
 
 Java console application that manages the working of S&J motors.
-## User Flow Diagram and Description
 
 
 ## Use Cases and Description
@@ -11,7 +10,7 @@ A Java application made using springboot and MySQL database.
 
 ### Use Cases:
 
-#### Login (Done By Hashim)
+#### Login (Done By All Members)
 
  
   * User should be able to sign in with his account.
@@ -22,7 +21,7 @@ A Java application made using springboot and MySQL database.
  
  * All Staff should able to sign in with their accounts.
 
-#### Sign up User (Done By Hashim)
+#### Sign up User (Done By All Members)
  
 *  User should be able to sign up and register using all his details.
 
@@ -41,3 +40,17 @@ A Java application made using springboot and MySQL database.
 * Activate Account
 * Deactivate Account
 * Transfer Account
+
+#### Manage Employees (Done By Abubakar)
+* Add Employee
+* Remove Employee
+* Assign Tasks
+
+#### View Statistics (Done By AhmadUllah)
+* View Job History
+* View Vehicles Milage
+* View Cost spent
+
+
+
+
