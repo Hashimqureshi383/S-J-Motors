@@ -1,7 +1,7 @@
 # S&J-Motors
 
 Java console application that manages the working of S&J motors.
-
+![](output.png)
 
 ## Use Cases and Description
 
