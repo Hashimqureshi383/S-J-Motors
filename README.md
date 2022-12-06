@@ -26,6 +26,9 @@ A Java application made using springboot and MySQL database.
  
 *  User should be able to sign up and register using all his details.
 
+#### Book Request User (Done By Hashim)
+* Allow the user to book a service request.
+
 #### Mark Attendance Staff (Done By Syed Ali Abbas)
  
 *  The staff should be able to mark their attendance.
@@ -35,5 +38,6 @@ A Java application made using springboot and MySQL database.
 *  The floor admin should be able to view all the marked attendance of the staff
 
 #### Manage Users (Done By Hassaan Tahir)
-* The user should be able to book a service request.
-
+* Activate Account
+* Deactivate Account
+* Transfer Account
