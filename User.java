@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class User implements DataDisplay.ViewStatistics
@@ -103,6 +106,25 @@ public class User implements DataDisplay.ViewStatistics
     {
 
     }
+    public void bookservice()
+    {
+        String jobDesc;
+        Scanner input=new Scanner(System.in);
+        jobDesc=input.nextLine();
+        FileWriter req;
+        try {
+            req=new FileWriter("Service Requests.txt",true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            req.write(this.getCnic());
+            req.write(" "+jobDesc);
+            req.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public boolean payCharges(float payable,float amount)
     {
         if(amount<payable)
@@ -110,16 +132,57 @@ public class User implements DataDisplay.ViewStatistics
         else
             return true;
     }
-    public void showHistory()
+    public void showHistory(Server app)
     {
-
+        int count=0;
+        Iterator<Job> it = app.jobs.iterator();
+        while (it.hasNext())
+        {
+            if((it.next().getCustomerId()==this.getCnic())&&(it.next().getStatus()))
+            {
+                System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+"\n");
+                count++;
+            }
+        }
+        if (count==0)
+            System.out.println("You have not taken any Service yet.\n");
     }
-    public void showMileage()
+    public void showMileage(Server app)
     {
-
+        System.out.flush();
+        System.out.println("Your Vehicles and their Mileages:\n\n");
+        int count=0;
+        Iterator<Vehicle> it=app.vehicles.iterator();
+        while (it.hasNext())
+        {
+            if (it.next().getRegBy()==this.getCnic())
+            {
+                System.out.println(it.next().getCompany()+"Model No: "+it.next().getModel()+" Mileage: 100 units\n");
+                count++;
+            }
+        }
+        if(count==0)
+            System.out.println("You do not own any Vehicle");
     }
-    public void showCostSpent()
+    public void showCostSpent(Server app)
     {
-
+        int count=0;
+        float cost=0;
+        Iterator<Job> it=app.jobs.iterator();
+        while (it.hasNext())
+        {
+            if((it.next().getCustomerId()==this.getCnic())&&(it.next().getStatus()))
+            {
+                System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+" Costed: 1000 PKR\n");
+                count++;
+            }
+        }
+        if(count==0)
+            System.out.println("You have not taken any Service yet.\n");
+        else
+        {
+            cost=1000*count;
+            System.out.println("The Total Cost is : "+Float.toString(cost)+" PKR\n");
+        }
     }
 }

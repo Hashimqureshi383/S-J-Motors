@@ -8,12 +8,13 @@ import java.util.Scanner;
     String password;
     String address;
     int outletId;
+    String type;
 
     public Manager()
     {
 
     }
-    public Manager(int id,String name,String phone,String password,String address,int outletId)
+    public Manager(int id,String name,String phone,String password,String address,int outletId,String type)
     {
         setId(id);
         setName(name);
@@ -21,6 +22,17 @@ import java.util.Scanner;
         setPassword(password);
         setAddress(address);
         setOutletId(outletId);
+        setType(type);
+    }
+    public Manager(final Manager obj)
+    {
+        setId(obj.getId());
+        setName(obj.getName());
+        setPhone(obj.getPhone());
+        setPassword(obj.getPassword());
+        setAddress(obj.getAddress());
+        setOutletId(obj.getOutletId());
+        setType(obj.getType());
     }
     //setters
     public void setId(int id)
@@ -47,6 +59,11 @@ import java.util.Scanner;
     {
         this.outletId=outletId;
     }
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
     //getters
     public int getId()
     {
@@ -72,6 +89,11 @@ import java.util.Scanner;
     {
         return outletId;
     }
+    public String getType()
+    {
+        return type;
+    }
+
     public boolean login()
     {
         String n;
@@ -93,12 +115,12 @@ import java.util.Scanner;
     public static Manager addManager(int id,String name,String phone,String password,String address,int outletId,String type)
     {
         if(type=="Floor")
-            return new FloorM(id,name,phone,password,address,outletId);
+            return new FloorM(id,name,phone,password,address,outletId,type);
         else if(type=="Inventory")
-            return new InventoryM(id,name,phone,password,address,outletId);
+            return new InventoryM(id,name,phone,password,address,outletId,type);
         else if(type=="Workshop")
-            return new WorkshopM(id,name,phone,password,address,outletId);
+            return new WorkshopM(id,name,phone,password,address,outletId,type);
         else
-            return new OutletAdmin(id,name,phone,password,address,outletId);
+            return new OutletAdmin(id,name,phone,password,address,outletId,type);
     }
 }

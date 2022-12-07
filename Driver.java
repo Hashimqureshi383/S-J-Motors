@@ -1,14 +1,13 @@
+import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Scanner;
-import java.util.Vector;
 
 public class Driver
 {
-    static Server app;
+    private static Server app;
 
     //my commit
     public static void main(String[] args)
@@ -45,7 +44,6 @@ public class Driver
     }
     private static void staffPage()
     {
-        boolean marked=false;
         while(true)
         {
             System.out.flush();
@@ -53,44 +51,11 @@ public class Driver
             System.out.println("1. Mark Attendance\n");
             System.out.println("2. Go Back");
             Scanner input_staff=new Scanner(System.in);
-            int option=0;
+            int option;
             option =input_staff.nextInt();
             if(option==1)
             {
-                if(marked)
-                {
-                    System.out.println("Your Attendance is Already Marked. Press Any key to continue...");
-                    input_staff.nextInt();
-                }
-                else
-                {
-                    int id=input_staff.nextInt();
-                    Iterator<Staff> it=app.employees.iterator();
-                    while(it.hasNext())
-                    {
-                        if(it.next().getId()==id)
-                        {
-                            System.out.println("Attendance Marked Successfully");
-                            marked=true;
-                            continue;
-                        }
-                    }
-                    long millis = System.currentTimeMillis();
-                    java.sql.Date date = new java.sql.Date(millis);
-                    Attendance obj=new Attendance(date.toString(), true, id);
-                    app.records.add(obj);
-                    FileWriter insertq;
-                    try {
-                        insertq=new FileWriter("DDL Queries.txt");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        insertq.write("Insert into attendancerecord (date,attendance,memberid) values (\'"+obj.getDate()+"\',1,"+Integer.toString(id));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                Staff.checkIn(false,app);
             }
             else if(option==2)
             {
@@ -99,26 +64,6 @@ public class Driver
                 return;
             }
         }
-    }
-    private static void bookRequest(User requestee)
-    {
-        String jobDesc;
-        Scanner input=new Scanner(System.in);
-        jobDesc=input.nextLine();
-        FileWriter req;
-        try {
-            req=new FileWriter("Service Requests.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            req.write(requestee.getCnic());
-            req.write(" "+jobDesc);
-            req.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
     private static void firstPage()
     {
@@ -181,12 +126,12 @@ public class Driver
                 app.users.add(newUser);
                 FileWriter insertq= null;
                 try {
-                    insertq = new FileWriter("DDL Queries.txt");
+                    insertq = new FileWriter("DDL Queries.txt",true);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 try {
-                    insertq.write("Insert into user values ");
+                    insertq.write("Insert into user (cnic,name,phone,password,address,outletid,status) values (");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -230,7 +175,18 @@ public class Driver
                         System.out.println("Enter Password= ");
                         loginManager.setPassword(input.nextLine());
                         if(loginManager.getPassword()==it.next().getPassword())
-                            adminMenu(loginManager);
+                        {
+                            if(it.next().getType()=="Outlet")
+                            {
+                                OutletAdmin admin=new OutletAdmin(loginManager);
+                                adminMenu(admin);
+                            }
+                            else
+                            {
+                                WorkshopM mgr=new WorkshopM(loginManager);
+                                workshopMgrPage(mgr);
+                            }
+                        }
                         else
                         {
                             System.out.println("Wrong Password");
@@ -243,7 +199,23 @@ public class Driver
             else if(choice==2)
                 return;
         }
-
+    }
+    public static void workshopMgrPage(WorkshopM mgr)
+    {
+        while(true)
+        {
+            System.out.flush();
+            System.out.println("\t\t\nS&JMotors:Workshop Manager\n");
+            System.out.println("1. Accept any Service Request\n");
+            System.out.println("2. Go Back\n");
+            Scanner input=new Scanner(System.in);
+            int choice=input.nextInt();
+            boolean flag=false;
+            if(choice==1)
+                mgr.bookService(app);
+            else if(choice==2)
+                return;
+        }
     }
     private static void userPage(User loggedInUser)
     {
@@ -263,224 +235,95 @@ public class Driver
             choice=input.nextByte();
             if(choice==1)
             {
-                System.out.flush();
-                System.out.println("Your Vehicles and their Mileages:\n\n");
-                int count=0;
-                Iterator<Vehicle> it=app.vehicles.iterator();
-                while (it.hasNext())
-                {
-                    if (it.next().getRegBy()==loggedInUser.getCnic())
-                    {
-                        System.out.println(it.next().getCompany()+"Model No: "+it.next().getModel()+" Mileage: 100 units\n");
-                        count++;
-                    }
-                }
-                if(count==0)
-                    System.out.println("You do not own any Vehicle");
+                loggedInUser.showMileage(app);
             }
             else if (choice==2)
             {
-                int count=0;
-                Iterator<Job> it = app.jobs.iterator();
-                while (it.hasNext())
-                {
-                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
-                    {
-                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+"\n");
-                        count++;
-                    }
-                }
-                if (count==0)
-                    System.out.println("You have not taken any Service yet.\n");
+                loggedInUser.showHistory(app);
             }
             else if (choice == 3)
             {
-                int count=0;
-                float cost=0;
-                Iterator<Job> it=app.jobs.iterator();
-                while (it.hasNext())
-                {
-                    if((it.next().getCustomerId()==loggedInUser.getCnic())&&(it.next().getStatus()))
-                    {
-                        System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+" Costed: 1000 PKR\n");
-                        count++;
-                    }
-                }
-                if(count==0)
-                    System.out.println("You have not taken any Service yet.\n");
-                else
-                {
-                    cost=1000*count;
-                    System.out.println("The Total Cost is : "+Float.toString(cost)+" PKR\n");
-                }
+                loggedInUser.showCostSpent(app);
             }
             else if(choice==4)
-                bookRequest(loggedInUser);
+                loggedInUser.bookservice();
             else if(choice==5)
                 return;
         }
     }
-    private static void adminMenu(Manager loggedInManager)
+    private static void adminMenu(OutletAdmin loggedInManager)
     {
         int op =0;
 
         while (op != 6)
         {
             System.out.flush();
-            System.out.print("S&JMotors: Outlet Admin\n\n");
-            System.out.print("1. Add employee\n");
-            System.out.print("2. Remove employee\n");
-            System.out.print("3. Assign Task\n");
-            System.out.print("4. Show Jobs\n");
-            System.out.print("5. Show Employees\n");
-            System.out.print("6. Go Back\n");
+            System.out.println("S&JMotors: Outlet Admin\n\n");
+            System.out.println("1. Add employee\n");
+            System.out.println("2. Remove employee\n");
+            System.out.println("3. Assign Task\n");
+            System.out.println("4. Show Jobs\n");
+            System.out.println("5. Show Employees\n");
+            System.out.println("6. Manage Users");
+            System.out.println("7. Go Back\n");
             Scanner input = new Scanner(System.in);
             op = input.nextInt();
             if (op == 1)
             {
-                addEmployee();
+                loggedInManager.addEmployee(app);
             }
             else if (op == 2)
             {
-                removeEmployee();
+                loggedInManager.removeEmployee(app);
             }
             else if (op == 3)
             {
-                AssignTask();
+                loggedInManager.AssignTask(app);
             }
             else if (op == 4)
             {
-                AllJobs();
+                DataDisplay.AllJobs(app);
             }
-            else if (op == 5) {
-                AllEmployee();
+            else if (op == 5)
+            {
+                DataDisplay.AllEmployee(app);
             }
-
+            else if(op==6)
+            {
+                manageUsers(loggedInManager);
+            }
+            else if(op==7)
+                return;
         }
     }
-
-    private static void AllEmployee()
+    public static void manageUsers(OutletAdmin admin)
     {
-        System.out.println("\n\n\nAll Employees: \n\n\n");
-        Iterator<Staff> it = app.employees.iterator();
-        while (it.hasNext()) {
-            System.out.println("\nName: " + it.next().getName());
-            System.out.println(" Id: " + it.next().getId());
-        }
-    }
-
-    private static void AllJobs() {
-        System.out.println("\n\n\nAll Jobs: \n\n\n");
-
-        Iterator<Job> it = app.jobs.iterator();
-
-        while (it.hasNext()) {
-            System.out.println("\nID: " + it.next().getId());
-            System.out.println(" Description: " + it.next().getDescription());
-            System.out.println(" Date: " + it.next().getScheduleDate());
-            System.out.println(" StaffID: " + it.next().getStaffId());
-            System.out.println(" CustomerID: "+ it.next().getCustomerId());
-        }
-
-    }
-
-    private static void addEmployee() {
-        int id = 0;
-        String name = null;
-        String phone = null;
-        String Address = null;
-        int outletId = 0;
-
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("\n\n\nEnter CNIC= ");
-        id = sc.nextInt();
-        System.out.println("Enter Name= ");
-        name = sc.nextLine(); // reads string.
-        System.out.println("Enter Phone Number= ");
-        phone = sc.nextLine(); // reads string.
-        System.out.println("Enter Address= ");
-        Address = sc.nextLine(); // reads string.
-        System.out.println("Enter Outlet ID= ");
-        outletId = sc.nextInt();
-
-        Staff newEmployee = new Staff(id, name, phone, Address, outletId);
-        app.employees.add(newEmployee);
-        FileWriter insertq;
-        try {
-            insertq=new FileWriter("DDL Queries.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            insertq.write("Insert into staff (id,name,phone,address,outletid) values ("+Integer.toString(id)+",\'"+name+"\',\'"+phone+"\',\'"+Address+"\',"+Integer.toString(outletId));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // System.out.println("Employee Added");
-
-    }
-
-    private static void removeEmployee() {
-        int idR = 0;
-
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("\n\n\nEnter CNIC/ID to remove= ");
-        idR = sc.nextInt();
-
-        Iterator<Staff> it = app.employees.iterator();
-
-        int header = 0;
-
-        while (it.hasNext() && header == 0) {
-
-            if (it.next().id == idR) {
-                it.next().id = 0;
-                it.next().name = null;
-                it.next().outletId = 0;
-                it.next().Address = null;
-                it.next().phone = null;
-                header = 1;
+        while(true)
+        {
+            System.out.flush();
+            System.out.print("\n1. Activate User\n");
+            System.out.print("2. Transfer User\n");
+            System.out.print("3. Deactivate User\n");
+            System.out.print("4. Exit\n\n");
+            System.out.print("Select an option > ");
+            Scanner option = new Scanner(System.in);
+            int select = option.nextInt();
+            int cnic=0;
+            boolean flag=false;
+            if (select == 1)
+            {
+                admin.activateUser(app);
             }
-        }
-        if (header == 1) {
-            System.out.println("\n\n\nEmployee deactivated \n\n\n ");
-        }
-
-        else {
-            System.out.println("\n\n\nEmployee Out Found \n\n\n ");
-
+            else if (select == 2)
+            {
+                admin.transferUser(app);
+            }
+            else if (select == 3)
+            {
+                admin.deactivateUser(app);
+            }
+            else if(select == 4)
+                return;
         }
     }
-    private static void AssignTask()
-    {
-        System.out.println("\n\n\nAssigning task\n\n\n");
-        int id = 0;
-        String description = null;
-        int customerId = 0;
-        int staffId = 0;
-        String scheduleDate = null;
-        int outletId = 0;
-
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("\n\n\nEnter Job ID= ");
-        id = sc.nextInt();
-        System.out.println("Enter Desprictions= ");
-        description = sc.nextLine(); // reads string.
-        System.out.println("Enter customer ID= ");
-        customerId = sc.nextInt(); // reads string.
-        System.out.println("Enter scheduleDate= ");
-        scheduleDate = sc.nextLine(); // reads string.
-        System.out.println("Enter Outlet ID= ");
-        outletId = sc.nextInt();
-
-        Job newJob = new Job(id, description, customerId, staffId, scheduleDate, outletId,false);
-
-        app.jobs.add(newJob);
-
-    }
-
-}
 }
