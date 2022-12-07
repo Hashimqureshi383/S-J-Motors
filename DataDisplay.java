@@ -27,18 +27,24 @@ public class DataDisplay
     {
         System.out.println("\n\n\nAll Employees: \n\n\n");
         Iterator<Staff> it = app.employees.iterator();
-        while (it.hasNext()) {
-            System.out.println("\nName: " + it.next().getName());
-            System.out.println(" Id: " + it.next().getId());
+        Staff temps;
+        while (it.hasNext())
+        {
+            temps=it.next();
+            System.out.println("\nName: " + temps.getName());
+            System.out.println(" Id: " + temps.getId());
         }
     }
     public static void AllUsers(Server app)
     {
         System.out.println("\n\n\nAll Employees: \n\n\n");
         Iterator<User> it = app.users.iterator();
-        while (it.hasNext()) {
-            System.out.println("\nCNIC: " + it.next().getCnic());
-            System.out.println(" Name: " + it.next().getName());
+        User tempu;
+        while (it.hasNext())
+        {
+            tempu=it.next();
+            System.out.println("\nCNIC: " + tempu.getCnic());
+            System.out.println(" Name: " + tempu.getName());
         }
     }
     public static void AllJobs(Server app)
@@ -46,13 +52,15 @@ public class DataDisplay
         System.out.println("\n\n\nAll Jobs: \n\n\n");
 
         Iterator<Job> it = app.jobs.iterator();
-
-        while (it.hasNext()) {
-            System.out.println("\nID: " + it.next().getId());
-            System.out.println(" Description: " + it.next().getDescription());
-            System.out.println(" Date: " + it.next().getScheduleDate());
-            System.out.println(" StaffID: " + it.next().getStaffId());
-            System.out.println(" CustomerID: "+ it.next().getCustomerId());
+        Job tempu;
+        while (it.hasNext())
+        {
+            tempu=it.next();
+            System.out.println("\nID: " + tempu.getId());
+            System.out.println(" Description: " + tempu.getDescription());
+            System.out.println(" Date: " + tempu.getScheduleDate());
+            System.out.println(" StaffID: " + tempu.getStaffId());
+            System.out.println(" CustomerID: "+ tempu.getCustomerId());
         }
 
     }

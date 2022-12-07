@@ -1,17 +1,15 @@
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.Scanner;
 
 public class Driver
 {
     private static Server app;
-
     //my commit
     public static void main(String[] args)
     {
+        Scanner input=new Scanner(System.in);
+        app=new Server();
         byte choice;
         while(true)
         {
@@ -28,18 +26,18 @@ public class Driver
             System.out.print("2. User\n");
             System.out.print("3. Employee/Staff\n");
             System.out.print("4. Exit\n");
-            Scanner input=new Scanner(System.in);
             choice=input.nextByte();
             if(choice==1)
-            {
                 managerPage();
-            }
             else if(choice==2)
                 firstPage();
             else if(choice==3)
                 staffPage();
             else if(choice==4)
+            {
+                app.loadDB();
                 return;
+            }
         }
     }
     private static void staffPage()
@@ -54,14 +52,17 @@ public class Driver
             int option;
             option =input_staff.nextInt();
             if(option==1)
-            {
                 Staff.checkIn(false,app);
-            }
             else if(option==2)
             {
                 System.out.println("GoodBye\n");
-                input_staff.close();
                 return;
+            }
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -80,76 +81,50 @@ public class Driver
             choice=input.nextByte();
             if(choice==1)
             {
-                User loginUser=new User();
-                System.out.println("Enter CNIC= ");
-                loginUser.setCnic(input.nextInt());
-                Iterator<User> it=app.users.iterator();
-                while(it.hasNext())
-                {
-                    if(it.next().getCnic()==loginUser.getCnic())
-                    {
-                        System.out.println("Enter Password= ");
-                        loginUser.setPassword(input.nextLine());
-                        if(loginUser.getPassword()==it.next().getPassword())
-                            userPage(loginUser);
-                        else
-                        {
-                            System.out.println("Wrong Password");
-                            continue;
-                        }
-                    }
-                }
-                System.out.println("Incorrect CNIC\n");
+                System.out.flush();
+                User loginUser = new User();
+                if (loginUser.loginToServer(app))
+                    userPage(loginUser);
             }
             else if(choice==2)
             {
+                System.out.flush();
                 User newUser=new User();
-                System.out.println("Enter CNIC= ");
-                newUser.setCnic(input.nextInt());
-                Iterator<User> it=app.users.iterator();
-                while(it.hasNext())
+                if(newUser.registerToService(app))
                 {
-                    if(it.next().getCnic()==newUser.getCnic())
-                    {
-                        System.out.println("The User with this CNIC already exists.\n");
-                        continue;
+                    app.users.add(newUser);
+                    app.noofUsers++;
+                    FileWriter insertq= null;
+                    BufferedWriter buff;
+                    PrintWriter printf;
+                    try {
+                        insertq = new FileWriter("DDL Queries.txt",true);
+//                    buff=new BufferedWriter(insertq);
+//                    printf=new PrintWriter(buff);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                }
-                System.out.println("Enter Name= ");
-                newUser.setName(input.nextLine());
-                System.out.println("Enter Phone Number= ");
-                newUser.setPhone(input.nextLine());
-                System.out.println("Enter Password= ");
-                newUser.setPassword(input.nextLine());
-                System.out.println("Enter Address= ");
-                newUser.setAddress(input.nextLine());
-                app.users.add(newUser);
-                FileWriter insertq= null;
-                try {
-                    insertq = new FileWriter("DDL Queries.txt",true);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    insertq.write("Insert into user (cnic,name,phone,password,address,outletid,status) values (");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    insertq.write(newUser.getCnic());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    insertq.write(Integer.toString(newUser.getCnic())+",\'"+newUser.getName()+"\',\'"+newUser.getPhone()+"\',\'"+newUser.getPassword()+"\',\'"+newUser.getAddress()+"\',0,1");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    try {
+                        insertq.write("Insert into user (cnic,name,phone,password,address,outletid,status) values ("+Integer.toString(newUser.getCnic())+",\'"+newUser.getName()+"\',\'"+newUser.getPhone()+"\',\'"+newUser.getPassword()+"\',\'"+newUser.getAddress()+"\',0,1)\n");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        insertq.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
             else if(choice==3)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-
     }
     private static void managerPage()
     {
@@ -164,40 +139,27 @@ public class Driver
             choice=input.nextByte();
             if(choice==1)
             {
-                Manager loginManager=new Manager();
-                System.out.println("Enter id= ");
-                loginManager.setId(input.nextInt());
-                Iterator<Manager> it=app.managers.iterator();
-                while(it.hasNext())
+                Manager mgr=new Manager();
+                int output=mgr.login(app);
+                if(output==2)
                 {
-                    if(it.next().getId()==loginManager.getId())
-                    {
-                        System.out.println("Enter Password= ");
-                        loginManager.setPassword(input.nextLine());
-                        if(loginManager.getPassword()==it.next().getPassword())
-                        {
-                            if(it.next().getType()=="Outlet")
-                            {
-                                OutletAdmin admin=new OutletAdmin(loginManager);
-                                adminMenu(admin);
-                            }
-                            else
-                            {
-                                WorkshopM mgr=new WorkshopM(loginManager);
-                                workshopMgrPage(mgr);
-                            }
-                        }
-                        else
-                        {
-                            System.out.println("Wrong Password");
-                            continue;
-                        }
-                    }
+                    OutletAdmin admin=new OutletAdmin(mgr);
+                    adminMenu(admin);
                 }
-                System.out.println("Incorrect ID\n");
+                else if(output==1)
+                {
+                    WorkshopM wmgr=new WorkshopM(mgr);
+                    workshopMgrPage(wmgr);
+                }
             }
             else if(choice==2)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     public static void workshopMgrPage(WorkshopM mgr)
@@ -215,6 +177,12 @@ public class Driver
                 mgr.bookService(app);
             else if(choice==2)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     private static void userPage(User loggedInUser)
@@ -249,12 +217,17 @@ public class Driver
                 loggedInUser.bookservice();
             else if(choice==5)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     private static void adminMenu(OutletAdmin loggedInManager)
     {
         int op =0;
-
         while (op != 6)
         {
             System.out.flush();
@@ -294,6 +267,12 @@ public class Driver
             }
             else if(op==7)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     public static void manageUsers(OutletAdmin admin)
@@ -324,6 +303,12 @@ public class Driver
             }
             else if(select == 4)
                 return;
+            System.out.println("Press Any key...");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

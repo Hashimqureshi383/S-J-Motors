@@ -53,6 +53,7 @@ public class WorkshopM extends Manager implements DataDisplay.ViewReport
                     java.sql.Date date = new java.sql.Date(millis);
                     Job newJob=new Job(app.getJobs(),desc[index],cnic,0,date.toString(),0,false);
                     app.jobs.add(newJob);
+                    app.noofJobs++;
                     FileWriter insertq;
                     try {
                         insertq=new FileWriter("DDL Queries.txt",true);
@@ -60,7 +61,12 @@ public class WorkshopM extends Manager implements DataDisplay.ViewReport
                         throw new RuntimeException(e);
                     }
                     try {
-                        insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(app.getJobs())+",\'"+desc[index]+"\',"+Integer.toString(ids[index])+",0,\'"+date.toString()+"\',0,0");
+                        insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(app.getJobs())+",\'"+desc[index]+"\',"+Integer.toString(ids[index])+",0,\'"+date.toString()+"\',0,0)\n");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        insertq.close();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -103,7 +109,7 @@ public class WorkshopM extends Manager implements DataDisplay.ViewReport
                 }
             }
             if(!flag)
-                System.out.println("No such Request exists\n");
+                System.out.println("No such Request exists.\n");
             readf.close();
         }
         else

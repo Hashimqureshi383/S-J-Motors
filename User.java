@@ -84,23 +84,63 @@ public class User implements DataDisplay.ViewStatistics
     {
         return status;
     }
-    public boolean registerToService(int cnic, String name, String phone, String password, String address)
+    public boolean registerToService(Server app)
     {
-        setCnic(cnic);
-        setName(name);
-        setPhone(phone);
-        setPassword(password);
-        setAddress(address);
+        System.out.flush();
+        Scanner input=new Scanner(System.in);
+        System.out.println("Enter CNIC= ");
+        setCnic(input.nextInt());
+        Iterator<User> it=app.users.iterator();
+        User tempu;
+        while(it.hasNext())
+        {
+            tempu=it.next();
+            if(tempu.getCnic()==getCnic())
+            {
+                System.out.println("The User with this CNIC already exists. Press any key...\n");
+                return false;
+            }
+        }
+        System.out.println("Enter Name= ");
+        setName(input.next());
+        System.out.println("Enter Phone Number= ");
+        setPhone(input.next());
+        System.out.println("Enter Password= ");
+        setPassword(input.next());
+        System.out.println("Enter Address= ");
+        setAddress(input.next());
         return true;
     }
-    public boolean loginToServer(int cnic,String password)
+    public boolean loginToServer(Server app)
     {
-        if(cnic!=this.cnic)
-            return false;
-        else if(password!=this.password)
-            return false;
-        else
-            return true;
+        System.out.flush();
+        System.out.println("Enter CNIC= ");
+        Scanner input=new Scanner(System.in);
+        setCnic(input.nextInt());
+        Iterator<User> it=app.users.iterator();
+        while(it.hasNext())
+        {
+            User tempu=it.next();
+            if(tempu.getCnic()==getCnic())
+            {
+                System.out.println("Enter Password= ");
+                setPassword(input.next());
+                if(getPassword().equals(tempu.getPassword()))
+                    return true;
+                else
+                {
+                    System.out.println("Wrong Password. Press any key...");
+                    try {
+                        System.in.read();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return false;
+                }
+            }
+        }
+        System.out.println("Incorrect CNIC. ");
+        return false;
     }
     public void enterData()
     {
@@ -108,9 +148,11 @@ public class User implements DataDisplay.ViewStatistics
     }
     public void bookservice()
     {
+        System.out.flush();
         String jobDesc;
         Scanner input=new Scanner(System.in);
-        jobDesc=input.nextLine();
+        System.out.println("Enter Service Description: ");
+        jobDesc=input.next();
         FileWriter req;
         try {
             req=new FileWriter("Service Requests.txt",true);
@@ -118,8 +160,13 @@ public class User implements DataDisplay.ViewStatistics
             throw new RuntimeException(e);
         }
         try {
-            req.write(this.getCnic());
+            req.write(Integer.toString(this.getCnic()));
             req.write(" "+jobDesc);
+            req.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
             req.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -134,13 +181,16 @@ public class User implements DataDisplay.ViewStatistics
     }
     public void showHistory(Server app)
     {
+        System.out.flush();
         int count=0;
         Iterator<Job> it = app.jobs.iterator();
+        Job tempj;
         while (it.hasNext())
         {
-            if((it.next().getCustomerId()==this.getCnic())&&(it.next().getStatus()))
+            tempj=it.next();
+            if((tempj.getCustomerId()==this.getCnic())&&(tempj.getStatus()))
             {
-                System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+"\n");
+                System.out.println(tempj.getDescription()+" Date "+tempj.getScheduleDate()+"\n");
                 count++;
             }
         }
@@ -153,11 +203,13 @@ public class User implements DataDisplay.ViewStatistics
         System.out.println("Your Vehicles and their Mileages:\n\n");
         int count=0;
         Iterator<Vehicle> it=app.vehicles.iterator();
+        Vehicle tempv=null;
         while (it.hasNext())
         {
-            if (it.next().getRegBy()==this.getCnic())
+            tempv=it.next();
+            if (tempv.getRegBy()==this.getCnic())
             {
-                System.out.println(it.next().getCompany()+"Model No: "+it.next().getModel()+" Mileage: 100 units\n");
+                System.out.println(tempv.getCompany()+"Model No: "+tempv.getModel()+" Mileage: 100 units\n");
                 count++;
             }
         }
@@ -166,14 +218,17 @@ public class User implements DataDisplay.ViewStatistics
     }
     public void showCostSpent(Server app)
     {
+        System.out.flush();
         int count=0;
         float cost=0;
         Iterator<Job> it=app.jobs.iterator();
+        Job tempj;
         while (it.hasNext())
         {
-            if((it.next().getCustomerId()==this.getCnic())&&(it.next().getStatus()))
+            tempj=it.next();
+            if((tempj.getCustomerId()==this.getCnic())&&(tempj.getStatus()))
             {
-                System.out.println(it.next().getDescription()+" Date "+it.next().getScheduleDate()+" Costed: 1000 PKR\n");
+                System.out.println(tempj.getDescription()+" Date "+tempj.getScheduleDate()+" Costed: 1000 PKR\n");
                 count++;
             }
         }

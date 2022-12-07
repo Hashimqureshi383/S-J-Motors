@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -36,22 +37,18 @@ public class OutletAdmin extends Manager
         String phone = null;
         String Address = null;
         int outletId = 0;
-
         Scanner sc = new Scanner(System.in);
-
         System.out.println("\n\n\nEnter CNIC= ");
         id = sc.nextInt();
         System.out.println("Enter Name= ");
-        name = sc.nextLine(); // reads string.
+        name = sc.next(); // reads string.
         System.out.println("Enter Phone Number= ");
-        phone = sc.nextLine(); // reads string.
+        phone = sc.next(); // reads string.
         System.out.println("Enter Address= ");
-        Address = sc.nextLine(); // reads string.
-        System.out.println("Enter Outlet ID= ");
-        outletId = sc.nextInt();
-
-        Staff newEmployee = new Staff(id, name, phone, Address, outletId);
+        Address = sc.next(); // reads string.
+        Staff newEmployee = new Staff(id, name, phone, Address, this.outletId);
         app.employees.add(newEmployee);
+        app.noofEmployees++;
         FileWriter insertq;
         try {
             insertq=new FileWriter("DDL Queries.txt",true);
@@ -59,7 +56,12 @@ public class OutletAdmin extends Manager
             throw new RuntimeException(e);
         }
         try {
-            insertq.write("Insert into staff (id,name,phone,address,outletid) values ("+Integer.toString(id)+",\'"+name+"\',\'"+phone+"\',\'"+Address+"\',"+Integer.toString(outletId));
+            insertq.write("Insert into staff (id,name,phone,address,outletid) values ("+Integer.toString(id)+",\'"+name+"\',\'"+phone+"\',\'"+Address+"\',"+Integer.toString(this.outletId)+")\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            insertq.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -77,19 +79,20 @@ public class OutletAdmin extends Manager
         idR = sc.nextInt();
         Iterator<Staff> it = app.employees.iterator();
         int header = 0;
-        Staff temp=null;
+        Staff temps=null;
         while (it.hasNext() && header == 0)
         {
-            if (it.next().getId() == idR)
+            temps=it.next();
+            if (temps.getId()==idR)
             {
-                temp=it.next();
-                app.employees.remove(temp);
+                app.employees.remove(temps);
+                app.noofEmployees--;
                 header = 1;
             }
         }
         if (header == 1)
         {
-            System.out.println("\n\n\nEmployee:"+Integer.toString(temp.getId())+" deactivated \n\n\n ");
+            System.out.println("\n\n\nEmployee:"+Integer.toString(temps.getId())+" deactivated \n\n\n ");
             FileWriter deleteq;
             try {
                 deleteq=new FileWriter("DDL Queries.txt",true);
@@ -97,7 +100,12 @@ public class OutletAdmin extends Manager
                 throw new RuntimeException(e);
             }
             try {
-                deleteq.write("Delete from staff where id="+Integer.toString(temp.getId()));
+                deleteq.write("Delete from staff where id="+Integer.toString(temps.getId())+"\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                deleteq.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -122,17 +130,18 @@ public class OutletAdmin extends Manager
         System.out.println("\n\n\nEnter Job ID= ");
         id = sc.nextInt();
         System.out.println("Enter Description= ");
-        description = sc.nextLine(); // reads string.
+        description = sc.next(); // reads string.
         System.out.println("Enter customer ID= ");
         customerId = sc.nextInt(); // reads string// .
         System.out.println("Enter Staff ID= ");
         staffId=sc.nextInt();
         System.out.println("Enter scheduleDate= ");
-        scheduleDate = sc.nextLine(); // reads string.
+        scheduleDate = sc.next(); // reads string.
         System.out.println("Enter Outlet ID= ");
         outletId = sc.nextInt();
-        Job newJob = new Job(id, description, customerId, staffId, scheduleDate, outletId,false);
+        Job newJob = new Job(app.getJobs(), description, customerId, staffId, scheduleDate, outletId,false);
         app.jobs.add(newJob);
+        app.noofJobs++;
         FileWriter insertq;
         try {
             insertq=new FileWriter("DDL Queries.txt",true);
@@ -140,7 +149,12 @@ public class OutletAdmin extends Manager
             throw new RuntimeException(e);
         }
         try {
-            insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(id)+",\'"+description+"\',"+Integer.toString(customerId)+","+Integer.toString(staffId)+",\'"+scheduleDate+"\',"+Integer.toString(outletId)+",0");
+            insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(id)+",\'"+description+"\',"+Integer.toString(customerId)+","+Integer.toString(staffId)+",\'"+scheduleDate+"\',"+Integer.toString(outletId)+",0)\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            insertq.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -154,11 +168,24 @@ public class OutletAdmin extends Manager
         System.out.println("Enter CNIC= ");
         cnic=option.nextInt();
         Iterator<User> it = app.users.iterator();
+        User tempu;
         while (it.hasNext())
         {
-            if(it.next().getCnic()==cnic)
+            tempu=it.next();
+            if(tempu.getCnic()==cnic)
             {
-                it.next().setStatus(true);
+                tempu.setStatus(true);
+                FileWriter updateq;
+                try {
+                    updateq=new FileWriter("DDL Queries.txt",true);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    updateq.write("Update table user set status=1 where cnic="+Integer.toString(tempu.getCnic())+"\n");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println("\n\n User activated. Press any key...\n");
                 flag=true;
             }
@@ -176,18 +203,33 @@ public class OutletAdmin extends Manager
         System.out.println("Enter CNIC= ");
         cnic=option.nextInt();
         Iterator<User> it = app.users.iterator();
+        User tempu;
+        Outlet tempo;
         while (it.hasNext())
         {
-            if(it.next().getCnic()==cnic)
+            tempu=it.next();
+            if(tempu.getCnic()==cnic)
             {
                 System.out.println("\n\nEnter New Outlet ID > ");
                 id = option.nextInt();
                 Iterator<Outlet> it2=app.outlets.iterator();
                 while(it2.hasNext())
                 {
-                    if(it2.next().getId()==id)
+                    tempo=it2.next();
+                    if(tempo.getId()==id)
                     {
-                        it.next().setOutletId(id);
+                        tempu.setOutletId(id);
+                        FileWriter updateq;
+                        try {
+                            updateq=new FileWriter("DDL Queries.txt",true);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            updateq.write("Update table user set outletid="+Integer.toString(tempo.getId())+" where cnic="+Integer.toString(tempu.getCnic())+"\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                         System.out.println("\n\n User transferred. Press any key...\n");
                         flag=true;
                     }
@@ -207,11 +249,24 @@ public class OutletAdmin extends Manager
         System.out.println("Enter CNIC= ");
         cnic=option.nextInt();
         Iterator<User> it = app.users.iterator();
+        User tempu;
         while (it.hasNext())
         {
-            if(it.next().getCnic()==cnic)
+            tempu=it.next();
+            if(tempu.getCnic()==cnic)
             {
-                it.next().setStatus(false);
+                tempu.setStatus(false);
+                FileWriter updateq;
+                try {
+                    updateq=new FileWriter("DDL Queries.txt",true);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    updateq.write("Update table user set status=0 where cnic="+Integer.toString(tempu.getCnic())+"\n");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 System.out.println("\n\n User deactivated. Press any key...\n");
                 flag=true;
             }

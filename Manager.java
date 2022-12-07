@@ -1,3 +1,4 @@
+import java.util.Iterator;
 import java.util.Scanner;
 
     public class Manager
@@ -93,25 +94,6 @@ import java.util.Scanner;
     {
         return type;
     }
-
-    public boolean login()
-    {
-        String n;
-        String pass;
-        System.out.println("Enter Name");
-        Scanner input=new Scanner(System.in);
-        n=input.nextLine();
-        if(n!=name)
-        {
-            return false;
-        }
-        pass=input.nextLine();
-        if(pass!=password)
-        {
-            return false;
-        }
-        return true;
-    }
     public static Manager addManager(int id,String name,String phone,String password,String address,int outletId,String type)
     {
         if(type=="Floor")
@@ -122,5 +104,39 @@ import java.util.Scanner;
             return new WorkshopM(id,name,phone,password,address,outletId,type);
         else
             return new OutletAdmin(id,name,phone,password,address,outletId,type);
+    }
+    public int login(Server app)
+    {
+        System.out.flush();
+        System.out.println("Enter id= ");
+        Scanner input=new Scanner(System.in);
+        setId(input.nextInt());
+        Iterator<Manager> it=app.managers.iterator();
+        Manager tempm;
+        while(it.hasNext())
+        {
+            tempm=it.next();
+            if(tempm.getId()==getId())
+            {
+                System.out.println("Enter Password= ");
+                setPassword(input.next());
+                if(getPassword().equals(tempm.getPassword()))
+                {
+                    if(tempm.getType()=="Outlet")
+                        return 2;
+                    else
+                        return 1;
+                }
+                else
+                {
+                    System.out.println("Wrong Password. Press Any key...");
+                    input.nextInt();
+                    return 0;
+                }
+            }
+        }
+        System.out.println("Incorrect ID. Press Any key...\n");
+        input.nextInt();
+        return 0;
     }
 }

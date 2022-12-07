@@ -1,17 +1,23 @@
+import javax.swing.plaf.nimbus.State;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.sql.*;
+import java.sql.DriverManager;
+import java.util.Scanner;
 import java.util.Vector;
 
     public class Server
 {
     Connection con;
-    int noofManagers;
-    int noofUsers;
-    int noofJobs;
-    int noofEmployees;
-    int noofAttendances;
-    int noofVehicles;
-    int noofOutlets;
-    int noofInventories;
+    public int noofManagers;
+    public int noofUsers;
+    public int noofJobs;
+    public int noofEmployees;
+    public int noofAttendances;
+    public int noofVehicles;
+    public int noofOutlets;
+    public int noofInventories;
     public Vector<Manager> managers;
     public Vector<User> users;
     public Vector<Job> jobs;
@@ -71,7 +77,11 @@ import java.util.Vector;
 
     public Connection connectDB()
     {
-        //Class.forName("com.mysql.jdbc.Driver");
+//      try {
+//            Class.forName("com.mysql.jdbc.Driver");
+//        } catch (ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//       }
         try {
             return DriverManager.getConnection("jdbc:mysql://localhost:3306/sjmotors", "root", "12345678");
         } catch (SQLException e) {
@@ -80,23 +90,23 @@ import java.util.Vector;
     }
     public void loadManagers(Connection con)
     {
-        Statement load= null;
+        Statement load;
         try {
             load = con.createStatement();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        ResultSet data= null;
+        ResultSet data;
         try {
             data = load.executeQuery("select * from manager");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+            //if(data.wasNull())
+            //    return;
+            //else
+            //{
                 while(data.next())
                     noofManagers++;
                 data=load.executeQuery("select * from manager");
@@ -106,7 +116,7 @@ import java.util.Vector;
                     Manager temp=Manager.addManager(data.getInt(1),data.getString(2),data.getString(3),data.getString(4),data.getString(5),data.getInt(6),data.getString(7));
                     managers.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -126,10 +136,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+            //if(data.wasNull())
+            //    return;
+            //else
+            //{
                 while(data.next())
                     noofUsers++;
                 data=load.executeQuery("select * from user");
@@ -139,7 +149,7 @@ import java.util.Vector;
                     User temp=new User(data.getInt(1),data.getString(2),data.getString(3),data.getString(4),data.getString(5),data.getInt(6), data.getBoolean(7));
                     users.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -159,10 +169,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+            //if(data.wasNull())
+            //    return;
+            //else
+            //{
                 while(data.next())
                     noofJobs++;
                 data=load.executeQuery("select * from job");
@@ -172,7 +182,7 @@ import java.util.Vector;
                     Job temp=new Job(data.getInt(1),data.getString(2),data.getInt(3),data.getInt(4),data.getString(5),data.getInt(6),data.getBoolean(7));
                     jobs.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -192,10 +202,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+            //if(data.wasNull())
+              //  return;
+            //else
+            //{
                 while(data.next())
                     noofEmployees++;
                 data=load.executeQuery("select * from staff");
@@ -205,7 +215,7 @@ import java.util.Vector;
                     Staff temp=new Staff(data.getInt(1),data.getString(2),data.getString(3),data.getString(4),data.getInt(5));
                     employees.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -225,10 +235,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+          //  if(data.wasNull())
+            //    return;
+            //else
+            //{
                 while(data.next())
                     noofAttendances++;
                 data=load.executeQuery("select * from attendancerecord");
@@ -238,7 +248,7 @@ import java.util.Vector;
                     Attendance temp=new Attendance(data.getString(1),data.getBoolean(2),data.getInt(3));
                     records.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -258,10 +268,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+           // if(data.wasNull())
+            //    return;
+            //else
+            //{
                 while(data.next())
                     noofVehicles++;
                 data=load.executeQuery("select * from vehicle");
@@ -271,7 +281,7 @@ import java.util.Vector;
                     Vehicle temp=new Vehicle(data.getInt(1),data.getString(2),data.getString(3),data.getString(4),data.getInt(5));
                     vehicles.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -291,10 +301,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+           // if(data.wasNull())
+           //     return;
+            //else
+            //{
                 while(data.next())
                     noofOutlets++;
                 data=load.executeQuery("select * from outlet");
@@ -304,7 +314,7 @@ import java.util.Vector;
                     Outlet temp=new Outlet(data.getInt(1),data.getString(2), data.getInt(3));
                     outlets.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -324,10 +334,10 @@ import java.util.Vector;
             throw new RuntimeException(e);
         }
         try {
-            if(data.wasNull())
-                return;
-            else
-            {
+           // if(data.wasNull())
+           //     return;
+           // else
+            //{
                 while(data.next())
                     noofInventories++;
                 data=load.executeQuery("select * from inventory");
@@ -337,9 +347,34 @@ import java.util.Vector;
                     Inventory temp=new Inventory(data.getInt(1),data.getString(2),data.getString(3),data.getString(4),data.getString(5),data.getInt(6));
                     inventories.add(temp);
                 }
-            }
+            //}
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void loadDB()
+    {
+        File queryFile=new File("DDL Queries.txt");
+        Scanner extract;
+        try {
+            extract=new Scanner(queryFile);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        Statement query;
+        try {
+            query=con.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        while(extract.hasNext())
+        {
+            try {
+                query.executeUpdate(extract.nextLine());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        queryFile.delete();
     }
 }
