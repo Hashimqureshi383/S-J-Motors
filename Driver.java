@@ -9,7 +9,7 @@ public class Driver
     public static void main(String[] args)
     {
         Scanner input=new Scanner(System.in);
-        app=new Server();
+        app=Server.createServer();
         byte choice;
         while(true)
         {

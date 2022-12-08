@@ -122,7 +122,7 @@ import java.util.Scanner;
                 setPassword(input.next());
                 if(getPassword().equals(tempm.getPassword()))
                 {
-                    if(tempm.getType()=="Outlet")
+                    if(tempm.getType().equals("Outlet"))
                         return 2;
                     else
                         return 1;
@@ -130,7 +130,6 @@ import java.util.Scanner;
                 else
                 {
                     System.out.println("Wrong Password. Press Any key...");
-                    input.nextInt();
                     return 0;
                 }
             }

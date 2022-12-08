@@ -118,9 +118,10 @@ public class User implements DataDisplay.ViewStatistics
         Scanner input=new Scanner(System.in);
         setCnic(input.nextInt());
         Iterator<User> it=app.users.iterator();
+        User tempu;
         while(it.hasNext())
         {
-            User tempu=it.next();
+            tempu=it.next();
             if(tempu.getCnic()==getCnic())
             {
                 System.out.println("Enter Password= ");

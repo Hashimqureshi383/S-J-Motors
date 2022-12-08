@@ -10,6 +10,8 @@ public class DataDisplay
         int count=0;
         File readreq;
         readreq=new File("Service Requests.txt");
+        if(!readreq.exists())
+            return 0;
         Scanner readf;
         try {
             readf=new Scanner(readreq);

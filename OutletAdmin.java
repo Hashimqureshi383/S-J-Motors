@@ -40,6 +40,17 @@ public class OutletAdmin extends Manager
         Scanner sc = new Scanner(System.in);
         System.out.println("\n\n\nEnter CNIC= ");
         id = sc.nextInt();
+        Iterator<Staff> it=app.employees.iterator();
+        Staff temps;
+        while(it.hasNext())
+        {
+            temps=it.next();
+            if(temps.getId()==id)
+            {
+                System.out.println("Staff already exists.\n");
+                return;
+            }
+        }
         System.out.println("Enter Name= ");
         name = sc.next(); // reads string.
         System.out.println("Enter Phone Number= ");
@@ -118,45 +129,67 @@ public class OutletAdmin extends Manager
     public void AssignTask(Server app)
     {
         System.out.println("\n\n\nAssigning task\n\n\n");
-        int id = 0;
-        String description = null;
-        int customerId = 0;
+        int jobId=0;
         int staffId = 0;
-        String scheduleDate = null;
         int outletId = 0;
+        boolean flag=false;
         DataDisplay.AllEmployee(app);
         DataDisplay.AllJobs(app);
         Scanner sc = new Scanner(System.in);
-        System.out.println("\n\n\nEnter Job ID= ");
-        id = sc.nextInt();
-        System.out.println("Enter Description= ");
-        description = sc.next(); // reads string.
-        System.out.println("Enter customer ID= ");
-        customerId = sc.nextInt(); // reads string// .
+        System.out.println("Enter Job ID= ");
+        jobId=sc.nextInt();
+        Iterator<Job> it3=app.jobs.iterator();
+        Job tempj=null;
+        while(it3.hasNext())
+        {
+            tempj=it3.next();
+            if(tempj.getId()==jobId)
+            {
+                flag = true;
+                break;
+            }
+        }
+        if(!flag)
+        {
+            System.out.println("No such Job Exists.\n");
+            return;
+        }
         System.out.println("Enter Staff ID= ");
         staffId=sc.nextInt();
-        System.out.println("Enter scheduleDate= ");
-        scheduleDate = sc.next(); // reads string.
-        System.out.println("Enter Outlet ID= ");
-        outletId = sc.nextInt();
-        Job newJob = new Job(app.getJobs(), description, customerId, staffId, scheduleDate, outletId,false);
-        app.jobs.add(newJob);
-        app.noofJobs++;
-        FileWriter insertq;
-        try {
-            insertq=new FileWriter("DDL Queries.txt",true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(id)+",\'"+description+"\',"+Integer.toString(customerId)+","+Integer.toString(staffId)+",\'"+scheduleDate+"\',"+Integer.toString(outletId)+",0)\n");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            insertq.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Iterator<Staff> it=app.employees.iterator();
+        Staff temps;
+        while(it.hasNext())
+        {
+            temps=it.next();
+            if(temps.getId()==staffId)
+            {
+                System.out.println("Enter Outlet ID= ");
+                outletId = sc.nextInt();
+                Iterator<Outlet> it2=app.outlets.iterator();
+                Outlet tempo;
+                while(it2.hasNext())
+                {
+                    tempo=it2.next();
+                    if(tempo.getId()==outletId)
+                    {
+                        tempj.setStaffId(staffId);
+                        tempj.setOutletId(outletId);
+                        FileWriter updateq;
+                        try {
+                            updateq=new FileWriter("DDL Queries.txt",true);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            updateq.write("Update table job set outletid="+Integer.toString(outletId)+",staffid="+Integer.toString(staffId)+" where id="+Integer.toString(jobId)+"\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        System.out.println("\n\n User transferred. Press any key...\n");
+                        flag=true;
+                    }
+                }
+            }
         }
     }
     public void activateUser(Server app)
@@ -191,8 +224,7 @@ public class OutletAdmin extends Manager
             }
         }
         if(!flag)
-            System.out.println("\nUser Not Found. Press any key...\n");
-        option.nextInt();
+            System.out.println("\nUser Not Found.\n");
     }
     public void transferUser(Server app)
     {
@@ -210,7 +242,7 @@ public class OutletAdmin extends Manager
             tempu=it.next();
             if(tempu.getCnic()==cnic)
             {
-                System.out.println("\n\nEnter New Outlet ID > ");
+                System.out.println("\n\nEnter New Outlet ID= ");
                 id = option.nextInt();
                 Iterator<Outlet> it2=app.outlets.iterator();
                 while(it2.hasNext())
@@ -237,8 +269,7 @@ public class OutletAdmin extends Manager
             }
         }
         if(!flag)
-            System.out.println("User or Staff not found. Press any key...");
-        option.nextInt();
+            System.out.println("User or Staff not found.");
     }
     public void deactivateUser(Server app)
     {
@@ -272,7 +303,6 @@ public class OutletAdmin extends Manager
             }
         }
         if(!flag)
-            System.out.println("\nUser Not Found. Press any key...\n");
-        option.nextInt();
+            System.out.println("\nUser Not Found.\n");
     }
 }

@@ -27,8 +27,20 @@ import java.util.Vector;
     public Vector<Outlet> outlets;
     public Vector<Inventory> inventories;
 
+    static int count;
     //getters
-    public Server()
+    public static Server createServer()
+    {
+        if(count==0)
+        {
+            count++;
+            return new Server();
+        }
+        else
+            return null;
+
+    }
+    private Server()
     {
         noofManagers=noofAttendances=noofEmployees=noofInventories=noofJobs=noofOutlets=noofUsers=noofVehicles=0;
         con=connectDB();
@@ -375,6 +387,6 @@ import java.util.Vector;
                 throw new RuntimeException(e);
             }
         }
-        queryFile.delete();
+        queryFile.deleteOnExit();
     }
 }

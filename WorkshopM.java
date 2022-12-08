@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -32,6 +33,11 @@ public class WorkshopM extends Manager implements DataDisplay.ViewReport
             String[] desc=new String[noOfReq];
             File readreq;
             readreq=new File("Service Requests.txt");
+            if(!readreq.exists())
+            {
+                System.out.println("No requests existing.");
+                return;
+            }
             Scanner readf;
             try {
                 readf=new Scanner(readreq);
@@ -49,63 +55,77 @@ public class WorkshopM extends Manager implements DataDisplay.ViewReport
             {
                 if(cnic==ids[index])
                 {
-                    long millis = System.currentTimeMillis();
-                    java.sql.Date date = new java.sql.Date(millis);
-                    Job newJob=new Job(app.getJobs(),desc[index],cnic,0,date.toString(),0,false);
-                    app.jobs.add(newJob);
-                    app.noofJobs++;
-                    FileWriter insertq;
-                    try {
-                        insertq=new FileWriter("DDL Queries.txt",true);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(app.getJobs())+",\'"+desc[index]+"\',"+Integer.toString(ids[index])+",0,\'"+date.toString()+"\',0,0)\n");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        insertq.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    ids[index]=0;
-                    desc[index]="";
-                    readreq.delete();
-                    FileWriter rewrite;
-                    try {
-                        rewrite=new FileWriter("Service Requests.txt",true);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    for(int index2=0;index2<noOfReq;index2++)
+                    System.out.println("\n\nEnter New Outlet ID > ");
+                    int oid = input.nextInt();
+                    Outlet tempo;
+                    Iterator<Outlet> it2=app.outlets.iterator();
+                    while(it2.hasNext())
                     {
-                        if(ids[index2]!=0)
+                        tempo = it2.next();
+                        if(tempo.getId()==oid)
                         {
+                            long millis = System.currentTimeMillis();
+                            java.sql.Date date = new java.sql.Date(millis);
+                            Job newJob=new Job(app.getJobs(),desc[index],cnic,0,date.toString(),0,false);
+                            app.jobs.add(newJob);
+                            app.noofJobs++;
+                            FileWriter insertq;
                             try {
-                                rewrite.write(ids[index]);
+                                insertq=new FileWriter("DDL Queries.txt",true);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                             try {
-                                rewrite.write(" ");
+                                insertq.write("Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values ("+Integer.toString(app.getJobs())+",\'"+desc[index]+"\',"+Integer.toString(ids[index])+",null,\'"+date.toString()+"\',"+Integer.toString(oid)+",0)\n");
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                             try {
-                                rewrite.write(desc[index]+"\n");
+                                insertq.close();
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
+                            ids[index]=0;
+                            desc[index]="";
+                            readreq.delete();
+                            FileWriter rewrite;
+                            try {
+                                rewrite=new FileWriter("Service Requests.txt",true);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            for(int index2=0;index2<noOfReq;index2++)
+                            {
+                                if(ids[index2]!=0)
+                                {
+                                    try {
+                                        rewrite.write(ids[index]);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    try {
+                                        rewrite.write(" ");
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    try {
+                                        rewrite.write(desc[index]+"\n");
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                            try {
+                                rewrite.close();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            System.out.println("Request successfully Accepted.\n");
+                            return;
                         }
                     }
-                    try {
-                        rewrite.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    flag=true;
+                    System.out.println("No Such Outlet exists.\n");
+                    return;
                 }
             }
             if(!flag)

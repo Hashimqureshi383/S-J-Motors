@@ -1,2 +1,1 @@
-Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values (1,'4',123,0,'2022-12-08',0,0)
-Insert into job (id,description,customer,staffid,scheduledate,outletid,status) values (2,'4',123,0,'2022-12-08',0,0)
+Insert into staff (id,name,phone,address,outletid) values (123,'Hashim','12','qw',0)
